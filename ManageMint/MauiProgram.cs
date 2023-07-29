@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using ManageMint.Data;
+using ManageMint.Services;
 using MudBlazor.Services;
 
 namespace ManageMint;
@@ -24,7 +24,7 @@ public static class MauiProgram
 #endif
 
 		builder.Services.AddMudServices();
-		builder.Services.AddSingleton<WeatherForecastService>();
+		builder.Services.AddTransient<IPeopleService, PeopleService>();
 
 		return builder.Build();
 	}
