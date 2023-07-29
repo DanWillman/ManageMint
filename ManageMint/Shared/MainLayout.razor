@@ -13,12 +13,23 @@
 <MudLayout>
     <MudAppBar Color="Color.Primary" Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle"/>
-        <MudIconButton Icon="@icon" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleMode" Style="justify-self: right"/>
+        <MudSpacer/>
+        <MudIconButton Icon="@icon" Color="Color.Inherit" Edge="Edge.End" OnClick="ToggleMode" Style="justify-self: right"/>
         <MudSpacer/>
         <AppMenu/>
     </MudAppBar>
     <MudDrawer @bind-Open="drawerOpen" Elevation="2" Width="320px">
-        <Sidebar/>
+        <MudButton
+            StartIcon="@Icons.Material.Outlined.LibraryBooks"
+            EndIcon="@Icons.Material.Outlined.LibraryBooks"
+            Href="diary"
+            Size="Size.Large"
+            >Diaries</MudButton>
+        <MudButton
+            StartIcon="@Icons.Material.Outlined.PeopleAlt"
+            EndIcon="@Icons.Material.Outlined.PeopleAlt"
+            Href="people"
+            Size="Size.Large">Manage People</MudButton>
     </MudDrawer>
     
     <MudMainContent>
