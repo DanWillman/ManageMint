@@ -24,8 +24,8 @@ public static class MauiProgram
 		builder.Services.AddMauiBlazorWebView();
 
 		builder.Configuration
-			.AddJsonFile("appsettings.json")
-			.AddUserSecrets<App>(optional: false, reloadOnChange: true)
+			.AddJsonFile("appsettings.json", optional: true)
+			.AddUserSecrets<App>(optional: true, reloadOnChange: true)
 			.Build();
 
 #if DEBUG
