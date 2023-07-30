@@ -11,7 +11,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using Testcontainers.MongoDb;
 
-namespace ManageMint.UnitTests;
+namespace ManageMint.IntegrationTests;
 
 [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class MongoTests
