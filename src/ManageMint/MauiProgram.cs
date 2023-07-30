@@ -1,4 +1,6 @@
-﻿using ManageMint.Models;
+﻿using ManageMint.Auth;
+using ManageMint.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
@@ -24,7 +26,6 @@ public static class MauiProgram
 		builder.Services.AddMauiBlazorWebView();
 
 		builder.Configuration
-			.AddJsonFile("appsettings.json", optional: true)
 			.AddUserSecrets<App>(optional: true, reloadOnChange: true)
 			.Build();
 
@@ -34,6 +35,16 @@ public static class MauiProgram
 #endif
 
 		builder.Services.AddMudServices();
+
+		builder.Services.AddSingleton(new Auth0Client(new()
+		{
+			Domain = builder.Configuration["Auth0:Domain"],
+			ClientId = builder.Configuration["Auth0:ClientId"],
+			Scope = "openid profile",
+			RedirectUri = "manmint://callback"
+		}));
+		builder.Services.AddAuthorizationCore();
+		builder.Services.AddScoped<AuthenticationStateProvider, Auth0AuthnStateProvider>();
 
 		BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 		builder.Services.AddSingleton<IMongoCollection<Person>>(s => new MongoClient(builder.Configuration["Mongo:ConnectionString"])

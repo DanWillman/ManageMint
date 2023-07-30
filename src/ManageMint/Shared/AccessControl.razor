@@ -1,0 +1,32 @@
+@using ManageMint.Auth
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<AuthorizeView>
+    <Authorized>
+        Hello, @context.User.Identity.Name!
+        <MudButton
+            StartIcon="@Icons.Material.Outlined.Logout"
+            href="#"
+            Size="Size.Large"
+            OnClick="LogOut"/>
+    </Authorized>
+    <NotAuthorized>
+        <MudIconButton
+            Icon="@Icons.Material.Outlined.Login"
+            Href="#"
+            OnClick="LogIn"/>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+
+    public async Task LogIn()
+    {
+        await ((Auth0AuthnStateProvider) AuthenticationStateProvider).LogInAsync();
+    }
+
+    public async Task LogOut()
+    {
+        await ((Auth0AuthnStateProvider) AuthenticationStateProvider).LogOutAsync();
+    }
+}
