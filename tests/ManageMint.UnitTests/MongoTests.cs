@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AutoBogus;
+using FluentAssertions;
 using ManageMint.DataAccess;
 using MongoDB.Driver;
 using ManageMint.Models;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using Testcontainers.MongoDb;
 
 namespace ManageMint.UnitTests;
 
@@ -15,65 +17,82 @@ namespace ManageMint.UnitTests;
 public class MongoTests
 {
     private const string COLLECTION_NAME = "people";
-    private MongoClient client;
     private IMongoDatabase db;
-    private IMongoCollection<Person> personCollection;
     private List<Person> fakes;
 
-    private Guid fakeReportsManagerId;
-    private List<Person> fakeReports;
-    private List<Person> confused;
+    private AutoFaker<Person> personFaker;
+    private MongoDbContainer mongoContainer;
 
     [OneTimeSetUp]
-    public void Setup()
+    public async Task Setup()
     {
+        mongoContainer = new MongoDbBuilder()
+            .WithUsername("local")
+            .WithPassword("local")
+            .Build();
+        await mongoContainer.StartAsync();
+        
         BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-        client =
-            new MongoClient(
-                @"mongodb+srv://dan:IiNL0wzCK6rHrWm2@managemint.onzlqof.mongodb.net/?retryWrites=true&w=majority");
+        
+        // This and the above serializer settings are what keeps guids in mongo in c# format, not their weird bindata format.
+        // This will be default in the next version of the driver, allegedly, which is why it's flagged obsolete. https://www.mongodb.com/community/forums/t/c-guid-style-dont-work/126901/2
+        // When removed from driver, this should be safe to remove.
+#pragma warning disable CS0618
+        BsonDefaults.GuidRepresentationMode = GuidRepresentationMode.V3;
+#pragma warning restore CS0618
+        
+        var client = new MongoClient(mongoContainer.GetConnectionString());
         db = client.GetDatabase("testing");
-        personCollection = db.GetCollection<Person>(COLLECTION_NAME);
+        var personCollection = db.GetCollection<Person>(COLLECTION_NAME);
         
-        if (personCollection.EstimatedDocumentCount() == 0)
-            db.CreateCollection(COLLECTION_NAME);
+        if (await personCollection.EstimatedDocumentCountAsync() == 0)
+            await db.CreateCollectionAsync(COLLECTION_NAME);
         
-        var personFaker = new AutoFaker<Person>();
+        personFaker = new AutoFaker<Person>();
 
         fakes = personFaker.Generate(10);
         
-        personCollection.InsertMany(fakes);
-
-        fakeReportsManagerId = fakes[0].ManagerId;
-        fakeReports = personFaker.RuleFor(p => p.ManagerId, _ => fakeReportsManagerId).Generate(3);
-        
-        personCollection.InsertMany(fakeReports);
-
-        confused = personCollection.Find(p => true).ToList();
+        await personCollection.InsertManyAsync(fakes);
     }
 
     [OneTimeTearDown]
-    public void TearDown()
+    public async Task TearDown()
     {
-        client.DropDatabase(db.DatabaseNamespace.DatabaseName);
+        await mongoContainer.StopAsync();
     }
 
     [Test]
-    public void Test1()
+    public async Task MongoService_GetAllPersons_ReturnsExpectedCollection()
     {
-        var sut = new MongoService(personCollection);
+        var sut = new MongoService(db, Options.Create(new Mongo()
+        {
+            PersonCollectionName = COLLECTION_NAME
+        }));
 
+        var actualReports = sut.GetAllPersons();
+
+        actualReports.Should().OnlyHaveUniqueItems(r => r.Id).And.HaveCount(fakes.Count)
+            .And.BeEquivalentTo(fakes, opt => opt.Including(p => p.Id), "They should be the same collection");
+    }
+
+    [Test]
+    public async Task MongoService_GetReports_ReturnsMatchingCollection()
+    {
+        var personCollection = db.GetCollection<Person>(COLLECTION_NAME);
+
+        var sut = new MongoService(db, Options.Create(new Mongo()
+        {
+            PersonCollectionName = COLLECTION_NAME
+        }));
+        
+        var fakeReportsManagerId = Guid.NewGuid();
+        var fakeReports = personFaker.RuleFor(p => p.ManagerId, _ => fakeReportsManagerId).Generate(3);
+        
+        await personCollection.InsertManyAsync(fakeReports);
+        
         var actualReports = sut.GetReports(fakeReportsManagerId);
 
-        Assert.That(actualReports.Count, Is.EqualTo(fakeReports.Count));
-        
-        foreach (var report in actualReports)
-        {
-            var expected = fakeReports.Find(p => p.Id.Equals(report.Id));
-            
-            Assert.NotNull(expected);
-            
-            Assert.That(report.Id, Is.EqualTo(expected?.Id));
-            Assert.That(report.Name, Is.EqualTo(expected?.Name));
-        }
+        actualReports.Should().OnlyHaveUniqueItems(r => r.Id).And.HaveCount(fakeReports.Count)
+            .And.BeEquivalentTo(fakeReports, opt => opt.Including(p => p.Id), "They should be the same collection");
     }
 }
