@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9BBB1C05
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{384585A1-F569-468F-B66D-7DE4FB86608A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManageMint.UnitTests", "tests\ManageMint.UnitTests\ManageMint.UnitTests.csproj", "{FFEE630B-1BD6-4584-B6EF-10190E098B11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{DCD4201F-15BC-4015-93B0-F6B103DDD6E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCD4201F-15BC-4015-93B0-F6B103DDD6E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCD4201F-15BC-4015-93B0-F6B103DDD6E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFEE630B-1BD6-4584-B6EF-10190E098B11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFEE630B-1BD6-4584-B6EF-10190E098B11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFEE630B-1BD6-4584-B6EF-10190E098B11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFEE630B-1BD6-4584-B6EF-10190E098B11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -35,5 +41,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{DCD4201F-15BC-4015-93B0-F6B103DDD6E4} = {9BBB1C05-7FD9-4238-997E-F7E75ED9CBF7}
 		{173C3F00-2FEE-49D2-941A-A8BB256360C1} = {384585A1-F569-468F-B66D-7DE4FB86608A}
+		{FFEE630B-1BD6-4584-B6EF-10190E098B11} = {9BBB1C05-7FD9-4238-997E-F7E75ED9CBF7}
 	EndGlobalSection
 EndGlobal
