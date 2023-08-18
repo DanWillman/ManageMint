@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst;net7.0</TargetFrameworks>
@@ -16,7 +16,7 @@
         <ApplicationTitle>ManageMint</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.managemint</ApplicationId>
+        <ApplicationId>dev.notsoevil.managemint</ApplicationId>
         <ApplicationIdGuid>EBE1B752-FEEC-49BD-96CD-29258665C33A</ApplicationIdGuid>
 
         <!-- Versions -->
@@ -58,6 +58,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1"/>
         <PackageReference Include="MongoDB.Driver" Version="2.20.0" />
         <PackageReference Include="MudBlazor" Version="6.7.0" />
     </ItemGroup>
