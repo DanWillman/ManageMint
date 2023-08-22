@@ -56,11 +56,13 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Markdig" Version="0.32.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1"/>
         <PackageReference Include="MongoDB.Driver" Version="2.20.0" />
-        <PackageReference Include="MudBlazor" Version="6.7.0" />
+        <PackageReference Include="MudBlazor" Version="6.8.0" />
+        <PackageReference Include="MudBlazor.Markdown" Version="0.1.2" />
     </ItemGroup>
 
 </Project>

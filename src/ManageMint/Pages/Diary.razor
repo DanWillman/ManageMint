@@ -1,0 +1,26 @@
+@page "/Diary"
+@using Markdig
+<h3>Diary Entries</h3>
+
+<div style="margin: auto;width: auto;">
+    <div style="float: left;width: 50%;font-size: medium">
+        <MudTextField T="string" class="form-control" 
+          @bind-value="Value" 
+          Immediate="true"
+          Lines="10"/>
+    </div>
+    <div style="float: right;width: 50%;font-size: large">
+        <MudMarkdown Value="@Value"/>
+        <!--@((MarkupString) Preview)-->
+    </div>
+</div>
+
+@code {
+    private string Value { get; set;} = "text *italics* and **bold**";
+    private string Preview => Markdown.ToHtml(Value);
+
+    private void OnValueChanged(string input)
+    {
+        Value = input;
+    }
+}

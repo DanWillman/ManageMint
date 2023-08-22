@@ -5,6 +5,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using MudBlazor;
 using MudBlazor.Services;
 
 namespace ManageMint;
@@ -34,6 +35,7 @@ public static class MauiProgram
 #endif
 
 		builder.Services.AddMudServices();
+		builder.Services.AddMudMarkdownServices();
 
 		BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 		builder.Services.AddSingleton<IMongoCollection<Person>>(s => new MongoClient(builder.Configuration["Mongo:ConnectionString"])
