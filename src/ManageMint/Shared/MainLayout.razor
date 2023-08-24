@@ -11,25 +11,53 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <MudAppBar Color="Color.Primary" Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle"/>
+    <MudAppBar Color="Color.Primary" Fixed="false">
+            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle"/>
+        </MudAppBar>
+    <MudDrawer @bind-Open="drawerOpen" Elevation="0" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Mini" Anchor="Anchor.Left">
+        <MudNavMenu>
+            <MudNavLink
+                Href="diary"
+                Icon="@Icons.Material.Outlined.MenuBook">Diaries</MudNavLink>
+            <MudNavGroup Title="People" Icon="@Icons.Material.Outlined.PeopleAlt">
+                <MudNavGroup Title="Managers" Icon="@Icons.Material.Outlined.SupervisorAccount">
+                    <MudNavLink
+                        Href="managers"
+                        Icon="@Icons.Material.Outlined.SupervisorAccount">View</MudNavLink>
+                    <MudNavLink
+                        Href="addManager"
+                        Icon="@Icons.Material.Outlined.PersonAddAlt">Add</MudNavLink>
+                </MudNavGroup>
+                <MudNavGroup Title="Reports" Icon="@Icons.Material.Outlined.Groups">
+                    <MudNavLink
+                        Href="reports"
+                        Icon="@Icons.Material.Outlined.Groups">View</MudNavLink>
+                    <MudNavLink
+                        Href="addReport"
+                        Icon="@Icons.Material.Outlined.PersonAdd">Add</MudNavLink>
+                </MudNavGroup>
+            </MudNavGroup>
+            <MudNavGroup Title="Discussion Topics" Icon="@Icons.Material.Outlined.VideoCameraFront">
+                
+            </MudNavGroup>
+            <MudNavGroup Title="One-on-Ones" Icon="@Icons.Material.Outlined.CompareArrows">
+                
+            </MudNavGroup>
+        </MudNavMenu>
         <MudSpacer/>
-        <MudIconButton Icon="@icon" Color="Color.Inherit" Edge="Edge.End" OnClick="ToggleMode" Style="justify-self: right"/>
+        <MudNavMenu>
+            <MudNavLink
+                Icon="@themeIcon"
+                OnClick="ToggleMode"/>
+        </MudNavMenu>
+    </MudDrawer>
+    <MudDrawer @bind-Open="settingsOpen" Elevation="1" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Mini" Anchor="Anchor.Right">
         <MudSpacer/>
-        <AppMenu/>
-    </MudAppBar>
-    <MudDrawer @bind-Open="drawerOpen" Elevation="2" Width="320px">
-        <MudButton
-            StartIcon="@Icons.Material.Outlined.LibraryBooks"
-            EndIcon="@Icons.Material.Outlined.LibraryBooks"
-            Href="diary"
-            Size="Size.Large"
-            >Diaries</MudButton>
-        <MudButton
-            StartIcon="@Icons.Material.Outlined.PeopleAlt"
-            EndIcon="@Icons.Material.Outlined.PeopleAlt"
-            Href="people"
-            Size="Size.Large">Manage People</MudButton>
+        <MudNavMenu>
+            <MudNavLink
+                Icon="@Icons.Custom.Brands.GitHub"
+                Href="https://github.com/NotSoEvilDevs/ManageMint"/>
+        </MudNavMenu>
     </MudDrawer>
     
     <MudMainContent>
@@ -40,17 +68,25 @@
 
 @code {
     bool drawerOpen = true;
+    bool settingsOpen = false;
     bool darkMode = true;
-    string icon = Icons.Material.Outlined.LightMode;
+    string themeIcon = Icons.Material.Outlined.LightMode;
+    string themeText = "Raise Lights";
 
     private void DrawerToggle()
     {
         drawerOpen = !drawerOpen;
     }
 
+    private void SettingsToggle()
+    {
+        settingsOpen = !settingsOpen;
+    }
+
     private void ToggleMode()
     {
         darkMode = !darkMode;
-        icon = darkMode ? Icons.Material.Outlined.LightMode : Icons.Material.Outlined.DarkMode;
+        themeIcon = darkMode ? Icons.Material.Outlined.LightMode : Icons.Material.Outlined.DarkMode;
+        themeText = darkMode ? "Raise Lights" : "Lower Lights";
     }
 }
