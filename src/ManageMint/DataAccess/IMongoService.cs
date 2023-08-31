@@ -4,7 +4,7 @@ namespace ManageMint.DataAccess;
 
 public interface IMongoService
 {
-    public Person GetManager(Guid reportId);
+    public Person GetPerson(Guid id);
 
     public List<Person> GetReports(Guid managerId);
 

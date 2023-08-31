@@ -1,14 +1,13 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using Realms;
 
 namespace ManageMint.Models;
 
-public class Person
+public partial class Person : RealmObject
 {
     /// <summary>
     /// Mongo generated Id
     /// </summary>
-    [BsonId]
+    [PrimaryKey]
     public Guid Id { get; set; }
     
     /// <summary>
@@ -47,10 +46,4 @@ public class Person
     public int Version { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-
-    /// <summary>
-    /// Document catches any non-specified fields from Mongo
-    /// </summary>
-    [BsonExtraElements]
-    private BsonDocument CatchAll { get; set; }
 }

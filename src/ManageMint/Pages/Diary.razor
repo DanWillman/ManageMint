@@ -1,26 +1,31 @@
 @page "/Diary"
 @using Markdig
-<h3>Diary Entries</h3>
+
+<h2 style="text-align: center">Diary Entries</h2>
 
 <div style="margin: auto;width: auto;">
-    <div style="float: left;width: 50%;font-size: medium">
+    <div style="float: left;width: 50%; height: 100%; font-size: large">
         <MudTextField T="string" class="form-control" 
-          @bind-value="Value" 
-          Immediate="true"
-          Lines="10"/>
+                      Variant="Variant.Outlined"
+                      @bind-value="Value" 
+                      Immediate="true"
+                      Lines="35"/>
     </div>
-    <div style="float: right;width: 50%;font-size: large">
+    <div style="float: right;width: 50%; height: 100%;font-size: x-large">
         <MudMarkdown Value="@Value"/>
         <!--@((MarkupString) Preview)-->
     </div>
 </div>
 
 @code {
-    private string Value { get; set;} = "text *italics* and **bold**";
+    private string Value { get; set;} = "**Markdown** *supported*";
     private string Preview => Markdown.ToHtml(Value);
 
     private void OnValueChanged(string input)
     {
         Value = input;
+        
+        //Upsert entry to collection
+        //Make sure we update the nav section 
     }
 }

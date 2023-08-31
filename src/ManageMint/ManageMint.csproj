@@ -63,6 +63,7 @@
         <PackageReference Include="MongoDB.Driver" Version="2.20.0" />
         <PackageReference Include="MudBlazor" Version="6.8.0" />
         <PackageReference Include="MudBlazor.Markdown" Version="0.1.2" />
+        <PackageReference Include="Realm" Version="11.4.0" />
     </ItemGroup>
 
 </Project>

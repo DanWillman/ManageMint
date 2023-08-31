@@ -2,30 +2,31 @@ using ManageMint.Models;
 using ManageMint.Models.Configuration;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Realms;
 
 namespace ManageMint.DataAccess;
 
 public class MongoService : IMongoService
 {
-    private readonly IMongoCollection<Person> personCollection;
+    private readonly Realm realm;
 
-    public MongoService(IMongoDatabase mongoDb, IOptions<Mongo> options)
+    public MongoService(IOptions<Mongo> options)
     {
-        personCollection = mongoDb.GetCollection<Person>(options.Value.PersonCollectionName);
+        realm = Realm.GetInstance(options.Value.DatabasePath);
     }
 
     public List<Person> GetReports(Guid managerId)
     {
-        return personCollection.Find(p => p.ManagerId.Equals(managerId)).ToList();
+        return realm.All<Person>().Where(p => p.ManagerId.Equals(managerId)).ToList();
     }
 
     public List<Person> GetAllPersons()
     {
-        return personCollection.Find(p => true).ToList();
+        return realm.All<Person>().ToList();
     }
 
-    public Person GetManager(Guid reportId)
+    public Person GetPerson(Guid id)
     {
-        return personCollection.Find(p => p.Id.Equals(reportId)).FirstOrDefault();
+        return realm.All<Person>().FirstOrDefault(p => p.Id.Equals(id));
     }
 }
