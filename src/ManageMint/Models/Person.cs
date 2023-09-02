@@ -18,7 +18,7 @@ public partial class Person : RealmObject
     /// <summary>
     /// Collection of <see cref="Person.Id"/>s of this Person's direct reports
     /// </summary>
-    public List<Guid> ReportsIds { get; set; }
+    public IList<Guid> ReportsIds { get; }
     
     /// <summary>
     /// Individual's preferred Name
@@ -28,22 +28,22 @@ public partial class Person : RealmObject
     /// <summary>
     /// Date individual joined the company
     /// </summary>
-    public DateTime HireDate { get; set; }
+    public DateTimeOffset HireDate { get; set; }
     
     /// <summary>
     /// Individual's birthday
     /// </summary>
-    public DateTime Birthday { get; set; }
+    public DateTimeOffset Birthday { get; set; }
     
     /// <summary>
     /// Free form text notes, supports markdown 
     /// </summary>
     public string Notes { get; set; }
 
-    public List<Guid> DiaryEntries { get; set; }
+    public IList<Guid> DiaryEntries { get; }
     
-    public List<Person> VersionHistory { get; set; }
+    public IList<Person> VersionHistory { get; }
     public int Version { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 }

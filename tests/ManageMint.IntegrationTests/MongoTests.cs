@@ -64,7 +64,7 @@ public class MongoTests
     [Test]
     public async Task MongoService_GetAllPersons_ReturnsExpectedCollection()
     {
-        var sut = new MongoService(db, Options.Create(new Mongo()
+        var sut = new MongoService(Options.Create(new Mongo()
         {
             PersonCollectionName = COLLECTION_NAME
         }));
@@ -80,7 +80,7 @@ public class MongoTests
     {
         var personCollection = db.GetCollection<Person>(COLLECTION_NAME);
 
-        var sut = new MongoService(db, Options.Create(new Mongo()
+        var sut = new MongoService(Options.Create(new Mongo()
         {
             PersonCollectionName = COLLECTION_NAME
         }));
