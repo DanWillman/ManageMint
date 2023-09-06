@@ -1,10 +1,14 @@
-﻿namespace ManageMint;
+﻿using ManageMint.Pages;
+
+namespace ManageMint;
 
 public partial class MainPage : ContentPage
 {
-	public MainPage()
+	public MainPage(Diary diary)
 	{
 		InitializeComponent();
+		
+		BindingContext = diary;
 	}
 }
 

@@ -1,4 +1,7 @@
-﻿using ManageMint.Models;
+﻿using ManageMint.DataAccess;
+using ManageMint.Models;
+using ManageMint.Models.Configuration;
+using ManageMint.Pages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
@@ -21,7 +24,7 @@ public static class MauiProgram
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 			});
-
+		
 		builder.Services.AddMauiBlazorWebView();
 
 		builder.Configuration
@@ -33,14 +36,17 @@ public static class MauiProgram
 		builder.Services.AddBlazorWebViewDeveloperTools();
 		builder.Logging.AddDebug();
 #endif
-
+		builder.Configuration.GetSection(nameof(Mongo)).Bind(new Mongo());
+		
 		builder.Services.AddMudServices();
 		builder.Services.AddMudMarkdownServices();
 
+		builder.Services.AddSingleton<IMongoService, MongoService>();
+		
+		builder.Services.AddSingleton<MainPage>();
+		builder.Services.AddTransient<Diary>();
+
 		BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-		builder.Services.AddSingleton<IMongoCollection<Person>>(s => new MongoClient(builder.Configuration["Mongo:ConnectionString"])
-			.GetDatabase(builder.Configuration["Mongo:Database"])
-			.GetCollection<Person>(builder.Configuration["Mongo:PersonCollectionName"]));
 		return builder.Build();
 	}
 }

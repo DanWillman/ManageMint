@@ -1,31 +1,124 @@
 @page "/Diary"
 @using Markdig
+@using ManageMint.DataAccess
+@using ManageMint.Models
+
+@inject IMongoService MongoService
 
 <h2 style="text-align: center">Diary Entries</h2>
 
 <div style="margin: auto;width: auto;">
+    <div>
+        <MudSelect T="DiaryEntry" Label="Select Entry" Variant="Variant.Outlined" ValueChanged="@OnSelectedChange" Value="SelectedEntry">
+            @foreach (var entry in Entries)
+            {
+                <MudSelectItem Value="@entry"/>
+            }
+        </MudSelect>
+        <MudButton StartIcon="@Icons.Material.Outlined.DeleteForever" OnClick="@ToggleDeleteConfirmation"/>
+        <MudButton StartIcon="@Icons.Material.Outlined.Create" OnClick="@OnCreateClicked"/>
+        
+        <MudPopover Open="@DeleteConfirmationOpen" Fixed="true">
+            <MudAlert Severity="Severity.Warning">Are you sure you want to delete?</MudAlert>
+            <MudButton OnClick="@OnDeleteClicked" Color="Color.Primary">Yes</MudButton>
+            <MudButton OnClick="@ToggleDeleteConfirmation" Color="Color.Error">No</MudButton>
+        </MudPopover>
+    </div>
     <div style="float: left;width: 50%; height: 100%; font-size: large">
-        <MudTextField T="string" class="form-control" 
+        <MudTextField T="string" class="form-control"
                       Variant="Variant.Outlined"
-                      @bind-value="Value" 
+                      Value="@CurrentValue"
+                      ValueChanged="OnValueChanged"
                       Immediate="true"
                       Lines="35"/>
     </div>
     <div style="float: right;width: 50%; height: 100%;font-size: x-large">
-        <MudMarkdown Value="@Value"/>
+        <MudMarkdown Value="@CurrentValue"/>
         <!--@((MarkupString) Preview)-->
     </div>
 </div>
+<MudButton StartIcon="@Icons.Material.Outlined.Save" OnClick="@OnSaveClicked"></MudButton>
+
 
 @code {
-    private string Value { get; set;} = "**Markdown** *supported*";
-    private string Preview => Markdown.ToHtml(Value);
+    private string CurrentValue { get; set; }
+    private List<DiaryEntry> Entries { get; set; }
+    private DiaryEntry SelectedEntry { get; set; }
+    private string Preview => Markdown.ToHtml(SelectedEntry.Body);
+    private bool DeleteConfirmationOpen { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        Entries = MongoService.GetDiaryEntries().OrderByDescending(d => d.UpdatedAt).ToList();
+        SelectedEntry = Entries.FirstOrDefault();
+        
+        if (SelectedEntry == null)
+        {
+            SelectedEntry = new DiaryEntry
+            {
+                Title = $"New Entry - {DateTimeOffset.Now.Date:mm/dd/yyyy hh:mm:ss tt}",
+                Body = string.Empty,
+                CreatedAt = DateTimeOffset.Now,
+                UpdatedAt = DateTimeOffset.Now
+            };
+            MongoService.UpsertDiaryEntry(SelectedEntry, string.Empty);
+            Entries.Add(SelectedEntry);
+        }
+        CurrentValue = SelectedEntry.Body;
+    }
+    
+    private void ToggleDeleteConfirmation()
+    {
+        DeleteConfirmationOpen = !DeleteConfirmationOpen;
+    }
+    
+    private void OnSelectedChange(DiaryEntry selected)
+    {
+        SelectedEntry = selected;
+        CurrentValue = SelectedEntry.Body;
+    }
 
     private void OnValueChanged(string input)
     {
-        Value = input;
-        
-        //Upsert entry to collection
-        //Make sure we update the nav section 
+        try
+        {
+            CurrentValue = input;
+            // if (SelectedEntry.UpdatedAt >= DateTimeOffset.Now.AddMinutes(5)) //TODO Expose to user pref
+            // {
+            //     MongoService.UpsertDiaryEntry(SelectedEntry);
+            // }
+            MongoService.UpsertDiaryEntry(SelectedEntry, CurrentValue);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    
+    private void OnSaveClicked()
+    {
+        MongoService.UpsertDiaryEntry(SelectedEntry, CurrentValue);
+    }
+
+    private void OnDeleteClicked()
+    {
+        MongoService.DeleteDiaryEntry(SelectedEntry.Id);
+        SelectedEntry = null;
+        Entries = MongoService.GetDiaryEntries().OrderByDescending(d => d.UpdatedAt).ToList();
+    }
+
+    private void OnCreateClicked()
+    {
+        SelectedEntry = new DiaryEntry
+        {
+            Title = $"New Entry - {DateTimeOffset.Now.Date:mm/dd/yyyy hh:mm:ss tt}",
+            Body = string.Empty,
+            CreatedAt = DateTimeOffset.Now,
+            UpdatedAt = DateTimeOffset.Now
+        };
+        MongoService.UpsertDiaryEntry(SelectedEntry, string.Empty);
+        CurrentValue = SelectedEntry.Body;
+        Entries = MongoService.GetDiaryEntries().OrderByDescending(d => d.UpdatedAt).ToList();
     }
 }
