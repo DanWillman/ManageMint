@@ -28,6 +28,7 @@
         <MudTextField T="string" class="form-control"
                       Variant="Variant.Outlined"
                       Value="@CurrentValue"
+                      DebounceInterval="@DebounceIntervalMs"
                       ValueChanged="OnValueChanged"
                       Immediate="true"
                       Lines="35"/>
@@ -37,8 +38,6 @@
         <!--@((MarkupString) Preview)-->
     </div>
 </div>
-<MudButton StartIcon="@Icons.Material.Outlined.Save" OnClick="@OnSaveClicked"></MudButton>
-
 
 @code {
     private string CurrentValue { get; set; }
@@ -46,6 +45,7 @@
     private DiaryEntry SelectedEntry { get; set; }
     private string Preview => Markdown.ToHtml(SelectedEntry.Body);
     private bool DeleteConfirmationOpen { get; set; } = false;
+    private double DebounceIntervalMs { get; set; } = 300; //TODO Expose to user pref
 
     protected override void OnInitialized()
     {
@@ -83,10 +83,6 @@
         try
         {
             CurrentValue = input;
-            // if (SelectedEntry.UpdatedAt >= DateTimeOffset.Now.AddMinutes(5)) //TODO Expose to user pref
-            // {
-            //     MongoService.UpsertDiaryEntry(SelectedEntry);
-            // }
             MongoService.UpsertDiaryEntry(SelectedEntry, CurrentValue);
         }
         catch (Exception e)
@@ -94,11 +90,6 @@
             Console.WriteLine(e);
             throw;
         }
-    }
-    
-    private void OnSaveClicked()
-    {
-        MongoService.UpsertDiaryEntry(SelectedEntry, CurrentValue);
     }
 
     private void OnDeleteClicked()
