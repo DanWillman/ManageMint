@@ -85,12 +85,11 @@ public class MongoTests
             PersonCollectionName = COLLECTION_NAME
         }));
         
-        var fakeReportsManagerId = Guid.NewGuid();
-        var fakeReports = personFaker.RuleFor(p => p.ManagerId, _ => fakeReportsManagerId).Generate(3);
+        var fakeReports = personFaker.Generate(3);
         
         await personCollection.InsertManyAsync(fakeReports);
         
-        var actualReports = sut.GetReports(fakeReportsManagerId);
+        var actualReports = sut.GetReports();
 
         actualReports.Should().OnlyHaveUniqueItems(r => r.Id).And.HaveCount(fakeReports.Count)
             .And.BeEquivalentTo(fakeReports, opt => opt.Including(p => p.Id), "They should be the same collection");

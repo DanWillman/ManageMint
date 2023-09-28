@@ -97,6 +97,7 @@
         MongoService.DeleteDiaryEntry(SelectedEntry.Id);
         SelectedEntry = null;
         Entries = MongoService.GetDiaryEntries().OrderByDescending(d => d.UpdatedAt).ToList();
+        DeleteConfirmationOpen = false;
     }
 
     private void OnCreateClicked()

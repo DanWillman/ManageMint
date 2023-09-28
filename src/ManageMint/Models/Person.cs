@@ -10,15 +10,7 @@ public partial class Person : RealmObject
     [PrimaryKey]
     public Guid Id { get; set; }
     
-    /// <summary>
-    /// <see cref="Person.Id"/> of this Person's Manager
-    /// </summary>
-    public Guid ManagerId { get; set; }
-    
-    /// <summary>
-    /// Collection of <see cref="Person.Id"/>s of this Person's direct reports
-    /// </summary>
-    public IList<Guid> ReportsIds { get; }
+    public string Role { get; set; }
     
     /// <summary>
     /// Individual's preferred Name
@@ -39,11 +31,14 @@ public partial class Person : RealmObject
     /// Free form text notes, supports markdown 
     /// </summary>
     public string Notes { get; set; }
-
-    public IList<Guid> DiaryEntries { get; }
     
     public IList<Person> VersionHistory { get; }
     public int Version { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }
