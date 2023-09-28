@@ -403,3 +403,6 @@ ASALocalRun/
 
 # Local History for Visual Studio
 .localhistory/
+tests/ManageMint.UnitTests/appsettings.local.json
+
+tests/ManageMint.IntegrationTests/appsettings.local.json

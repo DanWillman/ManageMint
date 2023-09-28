@@ -1,0 +1,98 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider @bind-IsDarkMode="@darkMode"/>
+
+<MudDialogProvider 
+    CloseButton="true"
+    CloseOnEscapeKey="false"
+    DisableBackdropClick="false"
+    MaxWidth="MaxWidth.Medium"
+    FullWidth="true"/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+    <MudAppBar Color="Color.Primary" Fixed="true">
+            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle"/>
+        </MudAppBar>
+    <MudDrawer @bind-Open="drawerOpen" Elevation="0" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Mini" Anchor="Anchor.Left">
+        <MudNavMenu>
+            <MudNavLink
+                Href="diary"
+                Icon="@Icons.Material.Outlined.MenuBook">Diaries</MudNavLink>
+            <MudNavLink
+                Href="managers"
+                Icon="@Icons.Material.Outlined.SupervisorAccount">Managers</MudNavLink>
+            <MudNavLink
+                Href="reports"
+                Icon="@Icons.Material.Outlined.Groups">Reports</MudNavLink>
+            @* <MudNavGroup Title="People" Icon="@Icons.Material.Outlined.PeopleAlt"> *@
+            @*     <MudNavGroup Title="Managers" Icon="@Icons.Material.Outlined.SupervisorAccount"> *@
+            @*         <MudNavLink *@
+            @*             Href="managers" *@
+            @*             Icon="@Icons.Material.Outlined.SupervisorAccount">View</MudNavLink> *@
+            @*         <MudNavLink *@
+            @*             Href="addManager" *@
+            @*             Icon="@Icons.Material.Outlined.PersonAddAlt">Add</MudNavLink> *@
+            @*     </MudNavGroup> *@
+            @*     <MudNavGroup Title="Reports" Icon="@Icons.Material.Outlined.Groups"> *@
+            @*         <MudNavLink *@
+            @*             Href="reports" *@
+            @*             Icon="@Icons.Material.Outlined.Groups">View</MudNavLink> *@
+            @*         <MudNavLink *@
+            @*             Href="addReport" *@
+            @*             Icon="@Icons.Material.Outlined.PersonAdd">Add</MudNavLink> *@
+            @*     </MudNavGroup> *@
+            @* </MudNavGroup> *@
+            <MudNavGroup Title="Discussion Topics" Icon="@Icons.Material.Outlined.VideoCameraFront">
+                
+            </MudNavGroup>
+            <MudNavGroup Title="One-on-Ones" Icon="@Icons.Material.Outlined.CompareArrows">
+                
+            </MudNavGroup>
+        </MudNavMenu>
+        <MudSpacer/>
+        <MudNavMenu>
+            <MudNavLink
+                Icon="@themeIcon"
+                OnClick="ToggleMode"/>
+        </MudNavMenu>
+    </MudDrawer>
+    <MudDrawer @bind-Open="settingsOpen" Elevation="1" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Mini" Anchor="Anchor.Right">
+        <MudSpacer/>
+        <MudNavMenu>
+            <MudNavLink
+                Icon="@Icons.Custom.Brands.GitHub"
+                Href="https://github.com/NotSoEvilDevs/ManageMint"/>
+        </MudNavMenu>
+    </MudDrawer>
+    
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+
+@code {
+    bool drawerOpen = true;
+    bool settingsOpen = false;
+    bool darkMode = true;
+    string themeIcon = Icons.Material.Outlined.LightMode;
+    string themeText = "Raise Lights";
+
+    private void DrawerToggle()
+    {
+        drawerOpen = !drawerOpen;
+    }
+
+    private void SettingsToggle()
+    {
+        settingsOpen = !settingsOpen;
+    }
+
+    private void ToggleMode()
+    {
+        darkMode = !darkMode;
+        themeIcon = darkMode ? Icons.Material.Outlined.LightMode : Icons.Material.Outlined.DarkMode;
+        themeText = darkMode ? "Raise Lights" : "Lower Lights";
+    }
+}

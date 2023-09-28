@@ -1,0 +1,150 @@
+@page "/Managers"
+@using ManageMint.Models
+@using ManageMint.DataAccess
+
+@inject IMongoService MongoService
+
+<h2 style="text-align: center">Managers</h2>
+
+<div style="margin: auto;width: auto;">
+    <div>
+        <MudSelect T="Person" Label="Select Manager" Variant="Variant.Outlined" ValueChanged="@OnSelectedChange" Value="SelectedManager">
+            @foreach (var person in People)
+            {
+                <MudSelectItem Value="@person"/>
+            }
+        </MudSelect>
+        <MudButton StartIcon="@Icons.Material.Outlined.DeleteForever" OnClick="@ToggleDeleteConfirmation"/>
+        <MudButton StartIcon="@Icons.Material.Outlined.Create" OnClick="@OnCreateClicked"/>
+        
+        <MudPopover Open="@DeleteConfirmationOpen" Fixed="true">
+            <MudAlert Severity="Severity.Warning">Are you sure you want to delete?</MudAlert>
+            <MudButton OnClick="@OnDeleteClicked" Color="Color.Primary">Yes</MudButton>
+            <MudButton OnClick="@ToggleDeleteConfirmation" Color="Color.Error">No</MudButton>
+        </MudPopover>
+    </div>
+    <div>
+        <MudSpacer/>
+        <MudTextField T="string" Label="Name" Variant="Variant.Outlined" @bind-Value="EditorName"/>
+        <MudDatePicker Label="Hire Date" Variant="Variant.Outlined" @bind-Date="EditorHireDate"></MudDatePicker>
+        <MudDatePicker Label="Birthday" Variant="Variant.Outlined" @bind-Date="EditorBirthday"></MudDatePicker>
+    </div>
+    <MudTextField T="string" class="form-control"
+                          @bind-Value="EditorNotes"
+                          Label="Notes"
+                          Variant="Variant.Outlined"
+                          Immediate="true"
+                          DebounceInterval="@DebounceIntervalMs"
+                          Lines="15"/>
+    <div>
+        <MudButton IconSize="Size.Large" EndIcon="@Icons.Material.Outlined.Save" OnClick="@OnSaveClicked"></MudButton>
+    </div>
+    <div>
+        @if (ShowSaveConfirmation)
+        {
+            <MudAlert style="text-align: center" ContentAlignment="HorizontalAlignment.Right" Severity="Severity.Success" Variant="Variant.Outlined" OnClick="(() => ShowSaveConfirmation = !ShowSaveConfirmation)">Manager saved</MudAlert>    
+        }
+        @if (ShowSaveError)
+        {
+            <MudAlert style="text-align: center" ContentAlignment="HorizontalAlignment.Right" Severity="Severity.Error" Variant="Variant.Outlined" OnClick="(() => ShowSaveError = !ShowSaveError)">Failed to save!</MudAlert>    
+        }
+    </div>
+</div>
+
+@code {
+    private List<Person> People { get; set; }
+    private Person SelectedManager { get; set; }
+    private bool DeleteConfirmationOpen { get; set; } = false;
+    private double DebounceIntervalMs { get; set; } = 300; //TODO is this needed for no autosave?
+    private bool ShowSaveConfirmation { get; set; } = false;
+    private bool ShowSaveError { get; set; } = false;
+
+    private DateTime? EditorHireDate { get; set; } = DateTime.Today;
+    private DateTime? EditorBirthday { get; set; } = DateTime.Today;
+    private string EditorName { get;set; }
+    private string EditorNotes { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Reset();
+        People = GetOrderedList();
+        SelectedManager = People.FirstOrDefault();
+        if (SelectedManager == null)
+        {
+            SelectedManager = CreateDefaultPerson();
+        }
+        
+        EditorHireDate = SelectedManager.HireDate.DateTime;
+        EditorBirthday = SelectedManager.Birthday.DateTime;
+        EditorNotes = SelectedManager.Notes;
+        EditorName = SelectedManager.Name;
+    }
+    
+    private void OnSelectedChange(Person selected)
+    {
+        SelectedManager = selected;
+    }
+    
+    private void ToggleDeleteConfirmation()
+    {
+        DeleteConfirmationOpen = !DeleteConfirmationOpen;
+    }
+    
+    private void OnDeleteClicked()
+    {
+        MongoService.DeletePerson(SelectedManager.Id);
+        SelectedManager = null;
+        People = GetOrderedList();
+        DeleteConfirmationOpen = false;
+    }
+
+    private void OnCreateClicked()
+    {
+        SelectedManager = CreateDefaultPerson();
+        MongoService.UpsertPerson(SelectedManager);
+        People = GetOrderedList();
+    }
+
+    private void OnSaveClicked()
+    {
+        try
+        {
+            MongoService.UpsertPerson(SelectedManager, EditorName, EditorNotes, EditorBirthday, EditorHireDate);
+            ShowSaveConfirmation = true;
+        }
+        catch (Exception e)
+        {
+            ShowSaveError = true;
+            Console.WriteLine(e);
+            throw;
+        }
+        
+    }
+
+    private List<Person> GetOrderedList()
+    {
+        return MongoService.GetManagers().OrderByDescending(p => p.Name).ToList();
+    }
+
+    private Person CreateDefaultPerson()
+    {
+        return new Person()
+        {
+            Id = Guid.NewGuid(),
+            Name = "New Manager",
+            Role = Role.Manager,
+            CreatedAt = DateTimeOffset.Now,
+            Version = 0
+        };
+    }
+    
+    private void Reset()
+    {
+        SelectedManager = null;
+        People = null;
+        EditorBirthday = null;
+        EditorHireDate = null;
+        EditorName = null;
+        EditorNotes = null;
+    }
+}

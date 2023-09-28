@@ -22,7 +22,8 @@ public static class MauiProgram
 		builder.Logging.AddDebug();
 #endif
 
-		builder.Services.AddSingleton<WeatherForecastService>();
+		builder.Services.AddTransient<IPeopleService, PeopleService>();
+		builder.Services.AddTransient<IDatabaseService, CouchbaseService>();
 
 		return builder.Build();
 	}

@@ -1,0 +1,43 @@
+version: "3"
+services:
+  couchbase1.cluster:
+    image: couchbase-managemint
+    container_name: couchbase-1
+    hostname: couchbase1.cluster
+    ports:
+      - 8091-8097:8091-8097
+      - 9123:9123
+      - 11207:11207
+      - 11210:11210
+      - 11280:11280
+      - 18091-18097:18091-18097
+    environment:
+      - MEMORY_QUOTA=256
+      - INDEX_MEMORY_QUOTA=256
+      - FTS_MEMORY_QUOTA=256
+      - SERVICES=kv,n1ql,index,fts
+      - USERNAME=admin
+      - PASSWORD=admin123
+    volumes:
+      - data_db:/opt/couchbase/
+    restart: unless-stopped
+  ## Uncomment below if you want another server in the node. 
+    ##As of 7/29/23 this isn't behing very well and doesn't make another server, needs some TLC
+  # couchbase2.cluster:
+  #   image: couchbase-managemint
+  #   depends_on:
+  #     - couchbase1.cluster
+  #   container_name: couchbase-2
+  #   hostname: couchbase2.cluster
+  #   environment:
+  #     - CLUSTER_HOST=couchbase1.cluster
+  #     - CLUSTER_REBALANCE=true
+  #     - SERVICES=kv,n1ql,index,fts
+  #     - USERNAME=admin
+  #     - PASSWORD=admin123
+  #   volumes:
+  #     - data_db:/opt/couchbase/
+  #   restart: unless-stopped
+volumes:
+  data_db:
+    name: Couchbase-cluster-data-db
