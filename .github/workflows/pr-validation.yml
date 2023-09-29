@@ -19,7 +19,7 @@ jobs:
         dotnet-version: '7.0.x'
     
     - name: Restore workloads
-      run: dotnet workload restore
+      run: dotnet workload install maui maui-android
 
     - name: Restore dependencies
       run: dotnet restore
