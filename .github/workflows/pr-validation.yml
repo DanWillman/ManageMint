@@ -6,9 +6,12 @@ on:
         - main
     workflow_dispatch:
 
+env:
+  DOTNETVERSION: 7.0.x
+
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: macos-12
 
     steps:
     - uses: actions/checkout@v2
@@ -17,15 +20,48 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '7.0.x'
+
+    - name: Setup .NET SDK ${{env.DOTNETVERSION}}
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version:  '${{env.DOTNETVERSION}}'
+          
+    - name: List installed .NET info
+      shell: pwsh
+      run: dotnet --info
+
+    - name: Install .NET MAUI
+      shell: bash
+      run: |
+        dotnet nuget locals all --clear 
+        dotnet workload install maui --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json --source https://api.nuget.org/v3/index.json
+        dotnet workload install android ios maccatalyst tvos macos maui wasm-tools --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json --source https://api.nuget.org/v3/index.json
+  
+    - name: Restore nuget packages
+      run: dotnet restore ManageMint.sln
+      
+      # https://docs.microsoft.com/en-us/dotnet/maui/macos/deployment/overview
+    - name : Build MacCatalyst App
+      shell: bash
+      run: |
+        cd src
+        dotnet build -f net7.0-maccatalyst -c Release -o ./artifacts
+        dotnet publish -f net7.0-maccatalyst -c Release -p:BuildIpa=True -o ./artifacts
+
+    - name: Build and Run UnitTests
+      shell: bash
+      run: |
+        dotnet build test/ManageMint.UnitTests/ManageMint.UnitTests.csproj
+        dotnet test test/ManageMint.UnitTests/ManageMint.UnitTests.csproj --no-build --verbosity normal
     
-    - name: Restore workloads
-      run: dotnet workload restore
-
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build
-      run: dotnet build --no-restore
-
-    - name: Test
-      run: dotnet test
+#    - name: Restore workloads
+#      run: dotnet workload restore
+#
+#    - name: Restore dependencies
+#      run: dotnet restore
+#
+#    - name: Build
+#      run: dotnet build --no-restore
+#
+#    - name: Test
+#      run: dotnet test
