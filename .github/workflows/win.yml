@@ -1,0 +1,67 @@
+name: Build and Release Windows
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build -c Release
+
+    - name: Test
+      run: dotnet test
+
+    - name: Publish
+      run: dotnet publish -c Release -r win-x64 --self-contained true
+
+    - name: Get Latest Tag
+      id: get_latest_tag
+      uses: actions/github-script@v4
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { data: tags } = await github.git.listTags({
+            owner: context.repo.owner,
+            repo: context.repo.repo
+          });
+          const latestTag = tags[0].ref;
+          const tagNumber = parseInt(latestTag.replace('refs/tags/v', ''));
+          const newTag = `v${tagNumber + 1}`;
+          console.log(`Latest tag: ${latestTag}, new tag: ${newTag}`);
+          return newTag;
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.get_latest_tag.outputs.result }},win-x64
+        release_name: Release ${{ steps.get_latest_tag.outputs.result }}
+        draft: true
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./bin/Release/net6.0/win-x64/publish/MyApp.exe
+        asset_name: MyApp.exe
+        asset_content_type: application/octet-stream
