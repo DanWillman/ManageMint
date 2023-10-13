@@ -15,6 +15,9 @@
         <!-- Display name -->
         <ApplicationTitle>ManageMint</ApplicationTitle>
 
+        <PublishTrimmed>false</PublishTrimmed>
+        <PublishAot>false</PublishAot>
+
         <!-- App Identifier -->
         <ApplicationId>dev.notsoevil.managemint</ApplicationId>
         <ApplicationIdGuid>EBE1B752-FEEC-49BD-96CD-29258665C33A</ApplicationIdGuid>
